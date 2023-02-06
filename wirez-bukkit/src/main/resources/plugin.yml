@@ -1,0 +1,6 @@
+main: io.github.dougcodez.wirezbukkit.WireZPlugin
+name: WireZ-Bukkit
+version: 1.0.0
+commands:
+  wirez:
+    aliases: [wz]
