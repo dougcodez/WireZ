@@ -87,3 +87,7 @@ WireZ database handler most importantly allows you to inspect tables at every an
 
 * **Table Dump** Dumps a copy or exact replica of a table into a CSV file of the database you're currently connected to.
 * **Table List** Get a list of tables a database contains. Output comes back as a https request paste with a key.
+
+## Download
+
+The link to download WireZ can be found [Here](https://www.spigotmc.org/resources/⚡-wirez-a-multi-platform-diagnostics-tool-lightweight-optimizable-⚡.100188/). It supports spigot, and bungeecord. Velocity Implementation will come soon!
