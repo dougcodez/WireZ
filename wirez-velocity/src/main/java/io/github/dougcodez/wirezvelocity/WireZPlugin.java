@@ -81,6 +81,7 @@ public class WireZPlugin implements WireZPluginExtension, PlatformInfo {
         settingsFile = new WireZSettingsFile();
         settingsFile.initConfigFile(getDataDirectory().toFile());
         MonitorManager.registerMonitors();
+        SystemsThreadExecutor.call();
         registerInstantiations();
         registerFiles();
         registerCommands();
