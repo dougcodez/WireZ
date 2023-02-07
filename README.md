@@ -90,4 +90,4 @@ WireZ database handler most importantly allows you to inspect tables at every an
 
 ## Download
 
-The link to download WireZ can be found [Here](https://www.spigotmc.org/resources/⚡-wirez-a-multi-platform-diagnostics-tool-lightweight-optimizable-⚡.100188/) (Thread needs an update overall). It supports spigot, bungeecord, velocity, and velocity4
+The link to download WireZ can be found [Here](https://www.spigotmc.org/resources/⚡-wirez-a-multi-platform-diagnostics-tool-lightweight-optimizable-⚡.100188/). It supports spigot, bungeecord, velocity, and velocity4
