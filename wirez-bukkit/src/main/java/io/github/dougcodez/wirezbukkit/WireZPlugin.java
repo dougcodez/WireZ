@@ -37,15 +37,15 @@ public class WireZPlugin extends JavaPlugin implements WireZPluginExtension, Pla
         registerFiles();
         registerCommands();
 
-        if(settingsFile.getConfigFile().getBoolean(("website-graph.enable"))){
+        if (settingsFile.getConfigFile().getBoolean(("website-graph.enable"))) {
             String host = settingsFile.getConfigFile().getString("website-graph.host");
             int port = settingsFile.getConfigFile().getInt("website-graph.port");
             WireZDataTransfer dataTransfer = new WireZDataTransfer(host, port);
-            Bukkit.getScheduler().runTaskTimerAsynchronously(this, dataTransfer::sendData, 20, 20*10);
+            Bukkit.getScheduler().runTaskTimerAsynchronously(this, dataTransfer::sendData, 20, 20 * 10);
         }
 
-        if(settingsFile.getConfigFile().getBoolean("database-module.enabled")){
-            if(SubCommandRegistry.getSubCommandMap().containsKey(DumpTable.class.getSimpleName())){
+        if (settingsFile.getConfigFile().getBoolean("database-module.enabled")) {
+            if (SubCommandRegistry.getSubCommandMap().containsKey(DumpTable.class.getSimpleName())) {
                 DumpTable dumpTable = (DumpTable) SubCommandRegistry.getSubCommandMap().get(DumpTable.class.getSimpleName());
                 dumpTable.setDataFolder(this::getDataFolder);
             }
@@ -96,6 +96,6 @@ public class WireZPlugin extends JavaPlugin implements WireZPluginExtension, Pla
 
     @Override
     public String getVersion() {
-        return "1.0.0";
+        return "1.0.1";
     }
 }

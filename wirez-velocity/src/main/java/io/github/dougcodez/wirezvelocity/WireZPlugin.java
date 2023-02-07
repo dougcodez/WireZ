@@ -1,42 +1,62 @@
-package io.github.dougcodez.wirezbungee;
+package io.github.dougcodez.wirezvelocity;
 
+import com.google.inject.Inject;
+import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.ProxyServer;
 import io.github.dougcodez.wirez.WireZPluginExtension;
 import io.github.dougcodez.wirez.commands.sub.SubCommandRegistry;
 import io.github.dougcodez.wirez.commands.sub.types.impl.database.DumpTable;
 import io.github.dougcodez.wirez.files.types.lang.LangFile;
 import io.github.dougcodez.wirez.files.types.settings.WireZSettingsFile;
-import io.github.dougcodez.wirez.monitors.MonitorManager;
 import io.github.dougcodez.wirez.monitors.task.SystemsThreadExecutor;
 import io.github.dougcodez.wirez.platform.PlatformInfo;
 import io.github.dougcodez.wirez.platform.PlatformType;
 import io.github.dougcodez.wirez.promise.PromiseGlobalExecutor;
 import io.github.dougcodez.wirez.websocket.WireZDataTransfer;
 import lombok.Getter;
-import net.md_5.bungee.api.plugin.Plugin;
 
+import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
+@Plugin(
+        id = "wirez",
+        name = "WireZ",
+        version = "1.0.1",
+        description = "A MC platform diagnostics tool used to collect system statistics and interactive database information",
+        authors = {"DougCodez"}
+)
 @Getter
-public class WireZPlugin extends Plugin implements WireZPluginExtension, PlatformInfo {
+public class WireZPlugin implements WireZPluginExtension, PlatformInfo {
 
-    private static WireZPlugin plugin;
+    private static WireZPlugin instance;
+    private final ProxyServer proxyServer;
+    private final Logger logger;
+    private final Path dataDirectory;
     private WireZSettingsFile settingsFile;
-    private BungeeLibraryManager libraryManager;
-    private BungeeLibrarySetup bungeeLibrarySetup;
+    private VelocityLibrarySetup velocityLibrarySetup;
+    private LangFile langFile;
 
+    @Inject
+    public WireZPlugin(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataDirectory) {
+        instance = this;
+        this.proxyServer = proxyServer;
+        this.logger = logger;
+        this.dataDirectory = dataDirectory;
+    }
 
-    public void onEnable() {
-        plugin = this;
+    @Subscribe(order = PostOrder.FIRST)
+    public void onEnable(ProxyInitializeEvent event) {
         this.getLogger().log(Level.INFO, getPlatformInfo());
         settingsFile = new WireZSettingsFile();
-        settingsFile.initConfigFile(getDataFolder());
-
-
-        MonitorManager.registerMonitors();
-        SystemsThreadExecutor.call();
+        settingsFile.initConfigFile(getDataDirectory().toFile());
         registerInstantiations();
-        registerLibraries();
         registerFiles();
         registerCommands();
 
@@ -44,18 +64,19 @@ public class WireZPlugin extends Plugin implements WireZPluginExtension, Platfor
             String host = settingsFile.getConfigFile().getString("website-graph.host");
             int port = settingsFile.getConfigFile().getInt("website-graph.port");
             WireZDataTransfer dataTransfer = new WireZDataTransfer(host, port);
-            this.getProxy().getScheduler().schedule(this, dataTransfer::sendData, 20, TimeUnit.SECONDS);
+            proxyServer.getScheduler().buildTask(this, dataTransfer::sendData).repeat(20, TimeUnit.SECONDS).schedule();
         }
 
         if (settingsFile.getConfigFile().getBoolean("database-module.enabled")) {
             if (SubCommandRegistry.getSubCommandMap().containsKey(DumpTable.class.getSimpleName())) {
                 DumpTable dumpTable = (DumpTable) SubCommandRegistry.getSubCommandMap().get(DumpTable.class.getSimpleName());
-                dumpTable.setDataFolder(this::getDataFolder);
+                dumpTable.setDataFolder(() -> getDataDirectory().toFile());
             }
         }
     }
 
-    public void onDisable() {
+    @Subscribe(order = PostOrder.LAST)
+    public void onDisable(ProxyShutdownEvent event){
         this.getLogger().log(Level.INFO, "WireZ is shutting down...");
         SystemsThreadExecutor.close();
         PromiseGlobalExecutor.close();
@@ -63,33 +84,33 @@ public class WireZPlugin extends Plugin implements WireZPluginExtension, Platfor
 
     @Override
     public void registerInstantiations() {
-        libraryManager = new BungeeLibraryManager(this);
-        bungeeLibrarySetup = new BungeeLibrarySetup();
+        velocityLibrarySetup = new VelocityLibrarySetup();
+        langFile = new LangFile();
     }
 
     @Override
     public void registerLibraries() {
-        bungeeLibrarySetup.loadLibraries();
+        velocityLibrarySetup.loadLibraries();
     }
 
     @Override
     public void registerFiles() {
-        LangFile.getInstance().initLangFile(getDataFolder());
+        langFile.initLangFile(getDataDirectory().toFile());
     }
 
     @Override
     public void registerCommands() {
         SubCommandRegistry.registerCommands(getSettingsFile());
-        getProxy().getPluginManager().registerCommand(plugin, new WireZCommandImpl());
+        proxyServer.getCommandManager().register("wirez", new WireZCommandImpl(), "wz");
     }
 
     public static WireZPlugin getInstance() {
-        return plugin;
+        return instance;
     }
 
     @Override
     public String getID() {
-        return "WireZ Bungee";
+        return "WireZ Velocity";
     }
 
     @Override
