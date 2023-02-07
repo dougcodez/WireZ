@@ -1,7 +1,7 @@
 <h1 align="center">
 	<img
 		alt="wirez"
-		src="https://raw.githubusercontent.com/DougCodez/WireZ/master/img/img.png>
+		src="https://raw.githubusercontent.com/DougCodez/WireZ/master/img/img.png">
 </h1>
 
 <h3 align="center">
