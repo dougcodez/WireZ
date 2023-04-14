@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @UtilityClass
 public class HealthFormat {
 
-        public static String format(Number valueType) {
+        public String format(Number valueType) {
         int dataPoint = valueType.intValue();
         String[] dataText = {
                 "&a⚫", "&a" + "⚫".repeat(2), "&a" + "⚫".repeat(3), "&e" + "⚫".repeat(4),
