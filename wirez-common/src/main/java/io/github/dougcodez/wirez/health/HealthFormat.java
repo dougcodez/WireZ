@@ -30,8 +30,18 @@ import java.util.concurrent.atomic.AtomicReference;
 @UtilityClass
 public class HealthFormat {
 
+        public static String format(Number valueType) {
+        int dataPoint = valueType.intValue();
+        String[] dataText = {
+                "&a⚫", "&a" + "⚫".repeat(2), "&a" + "⚫".repeat(3), "&e" + "⚫".repeat(4),
+                "&e" + "⚫".repeat(5), "&e" + "⚫".repeat(6), "&e" + "⚫".repeat(7), "&c" + "⚫".repeat(8),
+                "&4" + "⚫".repeat(9) + "&7" + "⚫", "&4" + "⚫".repeat(10)};
+        int index = (dataPoint - 1) / 10;
+        String value = dataText[index];
+        return "&8&l|" + value + "&8&l|";
+    }
 
-    public String format(Number valueType) {
+   /* public String format(Number valueType) {
         int dataPoint = valueType.intValue();
         AtomicReference<StringBuilder> dataText = new AtomicReference<>();
         if (dataPoint >= 0 && dataPoint <= 10) {
@@ -57,5 +67,5 @@ public class HealthFormat {
         }
 
         return "&8&l|" + dataText + "&8&l|";
-    }
+    }*/
 }
